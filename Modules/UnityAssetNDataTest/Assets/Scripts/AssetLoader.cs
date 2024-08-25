@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class AssetLoader : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class AssetLoader : MonoBehaviour
 
             return _assetBundle;
         }
-        set => _assetBundle = value;
     }
 
     
@@ -36,13 +36,25 @@ public class AssetLoader : MonoBehaviour
                 yield break;
             }
 
-            AssetBundle bundle = www.assetBundle;
-
-            if (bundle != null)
-            {
-                AssetBundle = bundle;
-            }
+            _assetBundle = www.assetBundle;
         }
+    }
+
+    public IEnumerator LoadCacheAssetBundle(string bundleURL, int version)
+    {
+        // 캐시 시스템을 다운 or 캐시에서 로드
+        UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL, (uint)version, 0);
+        
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError("Failed to download AssetBundle: " + request.error);
+            yield break;
+        }
+        
+        // 에셋 번들 로드
+        _assetBundle = DownloadHandlerAssetBundle.GetContent(request);
     }
 
     public void Unload()

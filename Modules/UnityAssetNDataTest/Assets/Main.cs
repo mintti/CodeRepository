@@ -22,7 +22,7 @@ public class Main : MonoBehaviour
     {
         string bundleURL = "file:///" + Application.dataPath + "/AssetBundles/test";
         
-        yield return _loader.LoadAssetBundle(bundleURL);
+        yield return _loader.LoadCacheAssetBundle(bundleURL, _version);
 
         var mat = _loader.AssetBundle.LoadAsset<Material>("cat.mat");
         _renderer.material = mat;
