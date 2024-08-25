@@ -20,11 +20,9 @@ public class Main : MonoBehaviour
 
     IEnumerator SetVer2()
     {
-        string bundleURL = "file:///" + Application.dataPath + "/AssetBundles/test";
-        
-        yield return _loader.LoadCacheAssetBundle(bundleURL, _version);
+        yield return _loader.LoadAsset(_version);
 
-        var mat = _loader.AssetBundle.LoadAsset<Material>("cat.mat");
+        var mat = _loader.CatMaterial;
         _renderer.material = mat;
     }
 }

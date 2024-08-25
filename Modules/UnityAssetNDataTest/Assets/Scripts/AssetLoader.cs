@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 
 public class AssetLoader : MonoBehaviour
 {
-
     private AssetBundle _assetBundle;
-
     public AssetBundle AssetBundle
     {
         get
@@ -20,9 +19,20 @@ public class AssetLoader : MonoBehaviour
             return _assetBundle;
         }
     }
-
     
-    public IEnumerator LoadAssetBundle(string bundleURL)
+    public Material CatMaterial { get; private set; }
+
+    public IEnumerator LoadAsset(int version)
+    {
+        string bundleURL = "file:///" + Application.dataPath + "/AssetBundles/test";
+
+        yield return LoadCacheAssetBundle(bundleURL, version);
+        CatMaterial = AssetBundle.LoadAsset<Material>("cat.mat");
+    }
+
+    #region Load Asset Bundle
+
+    IEnumerator LoadAssetBundle(string bundleURL)
     {
         // AssetBundle 로드
         using (WWW www = new WWW(bundleURL))
@@ -40,7 +50,7 @@ public class AssetLoader : MonoBehaviour
         }
     }
 
-    public IEnumerator LoadCacheAssetBundle(string bundleURL, int version)
+    IEnumerator LoadCacheAssetBundle(string bundleURL, int version)
     {
         // 캐시 시스템을 다운 or 캐시에서 로드
         UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL, (uint)version, 0);
@@ -61,4 +71,6 @@ public class AssetLoader : MonoBehaviour
     {
         AssetBundle.Unload(false);
     }
+    #endregion
+
 }
