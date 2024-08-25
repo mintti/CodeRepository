@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -19,15 +20,20 @@ public class AssetLoader : MonoBehaviour
             return _assetBundle;
         }
     }
-    
+
+    private const string _materialName = "cat.mat";
     public Material CatMaterial { get; private set; }
 
     public IEnumerator LoadAsset(int version)
     {
+#if  UNITY_EDITOR
+        LoadCatMaterialAssetDatabase();
+        yield break;
+#else
         string bundleURL = "file:///" + Application.dataPath + "/AssetBundles/test";
-
         yield return LoadCacheAssetBundle(bundleURL, version);
-        CatMaterial = AssetBundle.LoadAsset<Material>("cat.mat");
+        CatMaterial = AssetBundle.LoadAsset<Material>(_materialName);
+#endif
     }
 
     #region Load Asset Bundle
@@ -73,4 +79,20 @@ public class AssetLoader : MonoBehaviour
     }
     #endregion
 
+    void LoadCatMaterialAssetDatabase()
+    {
+        string assetPath = "Assets/AssetBundles/Materials/" + _materialName;
+        CatMaterial = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+    }
+
+    void LoadAllAsset()
+    {
+        string[] guids = AssetDatabase.FindAssets("t:Material");
+        foreach (string guid in guids)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+            // material 저장
+        }
+    }
 }
